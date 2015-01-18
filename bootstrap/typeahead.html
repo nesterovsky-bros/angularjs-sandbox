@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Typeahead</title>
+  <link type="text/css" rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+  <style type="text/css">
+    .ng-cloak { display: none; }
+  </style>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.9/angular.js"></script>
+  <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.0.js"></script>
+  <script>
+angular.module("app", ["ui.bootstrap"]).
+directive(
+  "typeahead",
+  ["$q", function ($q)
+  {
+    return (
+    {
+      require: 'ngModel',
+      link: function(scope, element, attrs, controller)
+      {
+        /**
+         * @description 
+         * Emits "updateSource" event on this scope.
+         * @param {Object} options Optional options with following properties:
+         *
+         *    - `keepSelection` - `{boolean}` - to keep selection.
+         *
+         * @returns an event.
+         */
+        scope.updateSource =
+          function(options) { return scope.$emit("updateSource", options); };
+
+        scope.$on(
+          "updateSource",
+          function(event, options)
+          {
+            if (scope != event.targetScope)
+            {
+              return;
+            }
+
+            if (element.attr("aria-expanded") !== "true")
+            {
+              event.preventDefault();
+
+              return;
+            }
+
+            options || (options = {});
+
+            var activeIdx = scope.activeIdx;
+            var value = controller.$modelValue;
+
+            for(var i = 0; i < controller.$parsers.length; i++)
+            {
+              if (value === undefined)
+              {
+                break;
+              }
+
+              value = controller.$parsers[i](value);
+            }
+
+            if (options.keepSelection)
+            {
+              scope.activeIdx = activeIdx;
+            }
+          });
+
+        var typeaheadSources;
+        var typeaheadResult;
+
+        /**
+         * A wrapper of array of sources, where it's assumed that each next 
+         * source delivers more data in cost of a longer working time.
+         *
+         * @param {object} value a typeahead hint.
+         *
+         * @param {function(object)} sourcesFn Function receiving typeahead
+         *   hint, and returning an array of {Object|Promise}.
+         *   If Object is passed rather than Promise then it should contain 
+         *   following properties:
+         *
+         *    - `promise` - `{Promise}` - a result promise.
+         *    - `cancel` - `{function()}` - optional function to cancel 
+         *                 the promise.
+         */
+        scope.sources = function(value, sourcesFn)
+        {
+          if (typeaheadResult)
+          {
+            return typeaheadResult;
+          }
+
+          var sources = typeaheadSources;
+
+          function cancel(count)
+          {
+            for (var i = 0; i < count; ++i)
+            {
+              var source = sources[i];
+
+              source.cancel && source.cancel();
+            }
+          }
+
+          sources && cancel(sources.length);
+          typeaheadSources = sources = sourcesFn(value);
+
+          return $q(function (resolve)
+          {
+            sources.forEach(function (source, index)
+            {
+              var promise = source.then ? source : source.promise;
+
+              promise.then(function (result)
+              {
+                if (sources != typeaheadSources)
+                {
+                  cancel(sources.length);
+
+                  return;
+                }
+
+                if (element[0] != document.activeElement)
+                {
+                  cancel(sources.length);
+                  typeaheadSources = null;
+
+                  return;
+                }
+
+                cancel(index);
+
+                if (!result || !result.length)
+                {
+                  return;
+                }
+
+                if (resolve)
+                {
+                  resolve(result);
+                  resolve = null;
+                }
+                else
+                {
+                  var options = { keepSelection: true };
+
+                  typeaheadResult = result;
+
+                  try
+                  {
+                    if (scope.updateSource(options).defaultPrevented)
+                    {
+                      cancel(sources.length);
+                      typeaheadSources = null;
+                    }
+                  }
+                  finally
+                  {
+                    typeaheadResult = null;
+                  }
+                }
+              });
+            });
+          });
+        }
+      }
+    });
+  }]).
+controller(
+  "Test",
+  ["$timeout",
+  function ($timeout)
+  {
+    this.text = null;
+    this.input = null;
+
+    function source(timeout, count, value)
+    {
+      return (
+      {
+        promise: $timeout(
+          function()
+          {
+            var result = [];
+
+            for(var i = 0; i < count; ++i)
+            {
+              result.push({ text: value + " " + i, id: i });
+            }
+
+            return result;
+          },
+          timeout),
+
+        cancel: function() { $timeout.cancel(this.promise); }
+      });
+    }
+
+    // Gets an array of objects in format: 
+    //   { promise: Promise, cancel: Function }
+    this.suggest = function(value)
+    {
+      return [source(500, 5, value), source(2000, 10, value)];
+    }
+  }]);
+  </script>
+</head>
+<body ng-app="app" ng-controller="Test as test">
+  <input type="text"
+    ng-model="test.text"
+    typeahead="items.text for items in sources($viewValue, test.suggest)" /><br />
+  <input type="text" ng-model="test.input" />
+</body>
+</html>
