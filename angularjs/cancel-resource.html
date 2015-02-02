@@ -16,8 +16,22 @@ factory(
     "$resource", "$q",
     function($resource, $q)
     {
-      return $resource(
+      function resolveAction(resolve)
+      {
+        if (this.params.$timeoutFn)
+        {
+          var defer = $q.defer();
 
+          this.timeout = defer.promise;
+          this.params.$timeoutFn(defer);
+          this.params.$timeoutFn = null;
+        }
+
+        this.then = null;
+        resolve(this);
+      }
+
+      return $resource(
         "http://md5.jsontest.com/",
         {},
         {
@@ -25,21 +39,7 @@ factory(
           {
             method: "GET",
             params: { text: null },
-
-            then: function(resolve)
-            {
-              if (this.params.$timeoutFn)
-              {
-                var defer = $q.defer();
-
-                this.timeout = defer.promise;
-                this.params.$timeoutFn(defer);
-                this.params.$timeoutFn = null;
-              }
-
-              this.then = null;
-              resolve(this);
-            }
+            then: resolveAction
           },
         });
     }]).
