@@ -16,8 +16,12 @@ factory(
   {
     function resolveAction(resolve)
     {
-      this.timeout = this.params.timeout;
-      this.params.timeout = null;
+      if (this.params)
+      {
+        this.timeout = this.params.timeout;
+        this.params.timeout = null;
+      }
+      
       this.then = null;
       resolve(this);
     }
