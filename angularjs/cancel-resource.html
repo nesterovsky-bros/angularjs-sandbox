@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Session</title>
+  <title>Cancel resource</title>
   <style type="text/css">
     .ng-cloak { display: none; }
   </style>
@@ -13,20 +13,13 @@ angular.module("app", ["ngResource"]).
 factory(
   "services",
   [
-    "$resource", "$q",
-    function($resource, $q)
+    "$resource",
+    function($resource)
     {
       function resolveAction(resolve)
       {
-        if (this.params.$timeoutFn)
-        {
-          var defer = $q.defer();
-
-          this.timeout = defer.promise;
-          this.params.$timeoutFn(defer);
-          this.params.$timeoutFn = null;
-        }
-
+        this.timeout = this.params.timeout;
+        this.params.timeout = null;
         this.then = null;
         resolve(this);
       }
@@ -45,26 +38,31 @@ factory(
     }]).
 controller(
   "Test",
-  ["services", "$timeout",
-  function(services, $timeout)
+  ["services", "$q", "$timeout",
+  function(services, $q, $timeout)
   {
     this.value = "Sample text";
-    this.timeout = 100;
+    this.requestTimeout = 100;
 
     this.call = function()
     {
-      var timeout;
-      var timeoutFn = function(defer) { timeout = defer };
+      var requestTimeout = this.requestTimeout;
 
-      this.result = services.MD5({ text: this.value, $timeoutFn: timeoutFn });
-      $timeout(function() { timeout && timeout.resolve(); }, this.timeout);
+      this.result = services.MD5(
+      {
+        text: this.value,
+        timeout: $q(function(resolve)
+        {
+          $timeout(resolve, requestTimeout);
+        })
+      });
     }
   }]);
   </script>
 </head>
 <body ng-app="app" ng-controller="Test as test">
   <label>Text: <input type="text" ng-model="test.value" /></label><br/>
-  <label>Timeout: <input type="text" ng-model="test.timeout" /></label><br/>
+  <label>Timeout: <input type="text" ng-model="test.requestTimeout" /></label><br/>
   <input type="button" value="call" ng-click="test.call()"/>
   <div ng-bind="test.result.md5"></div>
 </body>
