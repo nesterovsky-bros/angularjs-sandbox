@@ -12,48 +12,45 @@
 angular.module("app", ["ngResource"]).
 factory(
   "services",
-  [
-    "$resource",
-    function($resource)
+  ["$resource", function($resource)
+  {
+    function resolveAction(resolve)
     {
-      function resolveAction(resolve)
-      {
-        this.timeout = this.params.timeout;
-        this.params.timeout = null;
-        this.then = null;
-        resolve(this);
-      }
+      this.timeout = this.params.timeout;
+      this.params.timeout = null;
+      this.then = null;
+      resolve(this);
+    }
 
-      return $resource(
-        "http://md5.jsontest.com/",
-        {},
+    return $resource(
+      "http://md5.jsontest.com/",
+      {},
+      {
+        MD5:
         {
-          MD5:
-          {
-            method: "GET",
-            params: { text: null },
-            then: resolveAction
-          },
-        });
-    }]).
+          method: "GET",
+          params: { text: null },
+          then: resolveAction
+        },
+      });
+  }]).
 controller(
   "Test",
-  ["services", "$q", "$timeout",
-  function(services, $q, $timeout)
+  ["services", "$q", "$timeout", function(services, $q, $timeout)
   {
     this.value = "Sample text";
     this.requestTimeout = 100;
 
     this.call = function()
     {
-      var requestTimeout = this.requestTimeout;
+      var self = this;
 
-      this.result = services.MD5(
+      self.result = services.MD5(
       {
-        text: this.value,
+        text: self.value,
         timeout: $q(function(resolve)
         {
-          $timeout(resolve, requestTimeout);
+          $timeout(resolve, self.requestTimeout);
         })
       });
     }
