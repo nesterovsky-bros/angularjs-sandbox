@@ -1,5 +1,5 @@
 AngularJS Directives to model multisite template inclusions
------------------------------------------------------------
+--
 
 In our project we have modeled multi site trasclusion after JSF 2's ui:composition, ui:insert, ui:define (see [ui:composition][1]).
 
@@ -42,10 +42,11 @@ and finally, to instantiate the directive one needs to write (see [angularjs-api
 
 The working sample can be seen through rawgit: [sample.html][6]
 
-
+See also: [Multisute Transclusion in AngularJS][7]
   [1]: http://docs.oracle.com/javaee/6/javaserverfaces/2.0/docs/pdldocs/facelets/ui/composition.html
   [2]: ui-lib.js
   [3]: my-page.html
   [4]: my-page.js
   [5]: sample.html
   [6]: sample.html
+  [7]: http://www.nesterovsky-bros.com/weblog/2015/05/04/MultisiteTransclusionInAngularjs.aspx
