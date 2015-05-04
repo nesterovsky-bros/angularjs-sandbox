@@ -39,11 +39,11 @@ var uiDefine =
   scope: { name: "@uiDefine" },
   link: function(scope, element, attrs, controller, transclude)
   {
-    var place = controller[scope.name];
+    var site = controller[scope.name];
 
-    if (place && transclude)
+    if (site && transclude)
     {
-      transclude(function(clone) { place.empty().append(clone); }, place);
+      transclude(function(clone) { site.empty().append(clone); }, site);
     }
   }
 };
