@@ -18,7 +18,7 @@ var uiTemplate =
     transclude(
       function(clone)
       {
-        template = clone.addClass("ng-cloack");
+        template = clone.addClass("ng-cloak");
         element.append(template);
       });
 
