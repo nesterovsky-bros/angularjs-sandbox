@@ -2,7 +2,7 @@
 {
   var myPage = 
   {
-    templateUrl: "page.html",
+    templateUrl: "my-page.html",
     transclude: true
   };
   
