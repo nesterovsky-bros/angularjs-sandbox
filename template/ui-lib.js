@@ -15,12 +15,11 @@ var uiTemplate =
 
     var template;
 
-    transclude(
-      function(clone)
-      {
-        template = clone.addClass("ng-cloak");
-        element.append(template);
-      });
+    transclude(function(clone)
+    {
+      template = clone.addClass("ng-cloak");
+      element.append(template);
+    });
 
     template && template.remove();
   },
