@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+  <meta charset="utf-8" />
+  <title>templates</title>
+  <style type="text/css">.ng-cloak { display: none; }</style>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+  <script>
+var uiTemplate =
+{
+  restrict: "AE",
+  scope: {},
+  controller: function() {},
+  link: function(scope, element, attrs, controller, transclude)
+  {
+    if (!transclude)
+    {
+      throw new Error("No ancestor directive for transclusion is found.");
+    }
+
+    var template;
+
+    transclude(
+      function(clone)
+      {
+        template = clone.addClass("ng-cloack");
+        element.append(template);
+      });
+
+    template && template.remove();
+  },
+};
+
+var uiDefine =
+{
+  require: "^^uiTemplate",
+  restrict: "A",
+  transclude: true,
+  scope: { name: "@uiDefine" },
+  link: function(scope, element, attrs, controller, transclude)
+  {
+    var place = controller[scope.name];
+
+    if (place && transclude)
+    {
+      transclude(function(clone) { place.empty().append(clone); }, place);
+    }
+  }
+};
+
+var uiInsert =
+{
+  require: "^^uiTemplate",
+  restrict: "A",
+  scope: { name: "@uiInsert" },
+  link: function(scope, element, attrs, controller)
+  {
+    controller[scope.name] = element;
+  }
+};
+
+angular.module("app", []).
+  directive("uiTemplate", function() { return uiTemplate; }).
+  directive("uiDefine", function() { return uiDefine; }).
+  directive("uiInsert", function() { return uiInsert; });
+</script>
+
+  <script>
+var myPage = 
+{
+  templateUrl: "page",
+  transclude: true
+};
+
+angular.module("app").
+  directive("myPage", function() { return myPage; });
+  </script>
+
+  <script type="text/ng-template" id="page">
+    <table ui-template>
+      <tr>
+        <td ui-insert="menu" />
+      </tr>
+      <tr>
+        <td ui-insert="content" />
+      </tr>
+    </table>
+  </script>
+
+</head>
+<body>
+  <my-page>
+    <div ui-define="content">
+      My content
+    </div>
+    <div ui-define="menu">
+      <a href="#file">File</a> <a href="#edit">Edit</a> <a href="#view">View</a>
+    </div>
+  </my-page>
+</body>
+</html>
