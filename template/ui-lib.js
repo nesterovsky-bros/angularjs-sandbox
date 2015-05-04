@@ -54,7 +54,7 @@ var uiInsert =
   }
 };
 
-angular.module("ui-lib", []).
+angular.module("uiLib", []).
   directive("uiTemplate", function() { return uiTemplate; }).
   directive("uiDefine", function() { return uiDefine; }).
   directive("uiInsert", function() { return uiInsert; });
