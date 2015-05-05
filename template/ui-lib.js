@@ -13,17 +13,10 @@ var uiTemplate =
       throw new Error("No ancestor directive for transclusion is found.");
     }
 
-    var template;
-
     transclude(
-      function(clone)
-      {
-        template = clone.addClass("ng-cloack");
-        element.append(template);
-      });
-
-    template && template.remove();
-  },
+      function(clone) { element.append(clone.addClass("ng-cloak")); }).
+      remove();
+  }
 };
 
 var uiDefine =
