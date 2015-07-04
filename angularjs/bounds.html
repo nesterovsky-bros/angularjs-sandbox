@@ -1,0 +1,326 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Bounds directive</title>
+  <style type="text/css">.ng-cloak { display: none; }</style>
+<!--  <link type="text/css" rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />-->
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+<!--  <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.13.0.js"></script>-->
+  <script>
+angular.module("app", []).
+directive(
+  "uiBounds",
+  function()
+  {
+    var directive =
+    {
+      restrict: 'A',
+      link:
+      {
+        pre: function(scope, element, attr)
+        {
+          scope.$watch(
+            function()
+            {
+              var rect = element[0].getBoundingClientRect();
+
+              var bounds =
+              {
+                left: rect.left | 0,
+                top: rect.top | 0,
+                width: rect.width | 0,
+                height: rect.height | 0
+              };
+
+              return bounds;
+            },
+            function(value) { scope[attr.uiBounds] = value; },
+            true);
+        }
+      }
+    };
+
+    return directive;
+  }).
+directive(
+  "uiScroll",
+  [
+    "$parse",
+    function($parse)
+    {
+      var directive =
+      {
+        restrict: "A",
+        link:
+        {
+          post: function(scope, element, attrs)
+          {
+            var fn = $parse(attrs.uiScroll);
+            var applying;
+
+            element.on(
+              "scroll",
+              function(event)
+              {
+                if (!applying)
+                {
+                  applying = true;
+                  scope.$applyAsync(
+                    function()
+                    {
+                      applying = false;
+                      fn(scope, { $event: event });
+                    });
+                }
+              });
+          }
+        }
+      };
+
+      return directive;
+    }
+  ]);
+  </script>
+  <style>
+.logo 
+{
+  font-size: x-large;
+  font-weight: bold;    
+}  
+
+.login
+{
+  font-size: large;
+  float: right;
+  display: block;
+}
+
+.menu 
+{
+  font: menu;
+  background: menu;
+  padding: .5em;
+}
+
+.fixed
+{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+html 
+{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body
+{
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+  </style>
+</head>
+<body ng-app="app" ui-scroll>
+  <div class="head" ui-bounds="headBounds"
+    ng-style="{marginBottom: headBounds.top < -headBounds.height ? menuBounds.height + 'px' : null}">
+    <span class="login">login</span>
+    <span class="logo">My Library</span>
+  </div>
+  <div class="menu" ui-bounds="menuBounds"
+    ng-class="{fixed: headBounds.top < -headBounds.height}">
+    <a href="#">File</a> |
+    <a href="#">Edit</a> |
+    <a href="#">View</a> |
+    <a href="#">Tools</a> |
+    <a href="#">Windows</a>
+  </div>
+
+  <p>
+    <br />
+                          Александр Сергеевич Пушкин<br />
+    <br />
+                                Евгений Онегин<br />
+                                Роман в стихах<br />
+    <br />
+    Petri  de  vanite  il  avait  encore plus de cette espece d&#39;orgueil qui fait<br />
+    avouer  avec  la  meme  indifference les bonnes comme les mauvaises actions,<br />
+    suite d&#39;un sentiment de superiorite peut-etre imaginaire.<br />
+    <br />
+                                               Tire d&#39;une lettre particuliere.<br />
+    <br />
+                        Не мысля гордый свет забавить,<br />
+                        Вниманье дружбы возлюбя,<br />
+                        Хотел бы я тебе представить<br />
+                        Залог достойнее тебя,<br />
+                        Достойнее души прекрасной,<br />
+                        Святой исполненной мечты,<br />
+                        Поэзии живой и ясной,<br />
+                        Высоких дум и простоты;<br />
+                        Но так и быть - рукой пристрастной<br />
+                        Прими собранье пестрых глав,<br />
+                        Полусмешных, полупечальных,<br />
+                        Простонародных, идеальных,<br />
+                        Небрежный плод моих забав,<br />
+                        Бессонниц, легких вдохновений,<br />
+                        Незрелых и увядших лет,<br />
+                        Ума холодных наблюдений<br />
+                        И сердца горестных замет.<br />
+    <br />
+                                 ГЛАВА ПЕРВАЯ<br />
+    <br />
+                                        И жить торопится и чувствовать спешит.<br />
+                                                                Кн. Вяземский.<br />
+    <br />
+                                      I<br />
+    <br />
+                        &quot;Мой дядя самых честных правил,<br />
+                        Когда не в шутку занемог,<br />
+                        Он уважать себя заставил<br />
+                        И лучше выдумать не мог.<br />
+                        Его пример другим наука;<br />
+                        Но, боже мой, какая скука<br />
+                        С больным сидеть и день и ночь,<br />
+                        Не отходя ни шагу прочь!<br />
+                        Какое низкое коварство<br />
+                        Полуживого забавлять,<br />
+                        Ему подушки поправлять,<br />
+                        Печально подносить лекарство,<br />
+                        Вздыхать и думать про себя:<br />
+                        Когда же черт возьмет тебя!&quot;<br />
+    <br />
+                                      II<br />
+    <br />
+                        Так думал молодой повеса,<br />
+                        Летя в пыли на почтовых,<br />
+                        Всевышней волею Зевеса<br />
+                        Наследник всех своих родных.<br />
+                        Друзья Людмилы и Руслана!<br />
+                        С героем моего романа<br />
+                        Без предисловий, сей же час<br />
+                        Позвольте познакомить вас:<br />
+                        Онегин, добрый мой приятель,<br />
+                        Родился на брегах Невы,<br />
+                        Где, может быть, родились вы<br />
+                        Или блистали, мой читатель;<br />
+                        Там некогда гулял и я:<br />
+                        Но вреден север для меня {1}.<br />
+    <br />
+                                     III<br />
+    <br />
+                        Служив отлично благородно,<br />
+                        Долгами жил его отец,<br />
+                        Давал три бала ежегодно<br />
+                        И промотался наконец.<br />
+                        Судьба Евгения хранила:<br />
+                        Сперва Madame за ним ходила,<br />
+                        Потом Monsieur ее сменил.<br />
+                        Ребенок был резов, но мил.<br />
+                        Monsieur l&#39;Abbe, француз убогой,<br />
+                        Чтоб не измучилось дитя,<br />
+                        Учил его всему шутя,<br />
+                        Не докучал моралью строгой,<br />
+                        Слегка за шалости бранил<br />
+                        И в Летний сад гулять водил.<br />
+    <br />
+                                      IV<br />
+    <br />
+                        Когда же юности мятежной<br />
+                        Пришла Евгению пора,<br />
+                        Пора надежд и грусти нежной,<br />
+                        Monsieur прогнали со двора.<br />
+                        Вот мой Онегин на свободе;<br />
+                        Острижен по последней моде,<br />
+                        Как dandy {2} лондонский одет -<br />
+                        И наконец увидел свет.<br />
+                        Он по-французски совершенно<br />
+                        Мог изъясняться и писал;<br />
+                        Легко мазурку танцевал<br />
+                        И кланялся непринужденно;<br />
+                        Чего ж вам больше? Свет решил,<br />
+                        Что он умен и очень мил.<br />
+    <br />
+                                      V<br />
+    <br />
+                        Мы все учились понемногу<br />
+                        Чему-нибудь и как-нибудь,<br />
+                        Так воспитаньем, слава богу,<br />
+                        У нас немудрено блеснуть.<br />
+                        Онегин был по мненью многих<br />
+                        (Судей решительных и строгих)<br />
+                        Ученый малый, но педант:<br />
+                        Имел он счастливый талант<br />
+                        Без принужденья в разговоре<br />
+                        Коснуться до всего слегка,<br />
+                        С ученым видом знатока<br />
+                        Хранить молчанье в важном споре<br />
+                        И возбуждать улыбку дам<br />
+                        Огнем нежданных эпиграмм.<br />
+    <br />
+                                      VI<br />
+    <br />
+                        Латынь из моды вышла ныне:<br />
+                        Так, если правду вам сказать,<br />
+                        Он знал довольно по-латыне,<br />
+                        Чтоб эпиграфы разбирать,<br />
+                        Потолковать об Ювенале,<br />
+                        В конце письма поставить vale,<br />
+                        Да помнил, хоть не без греха,<br />
+                        Из Энеиды два стиха.<br />
+                        Он рыться не имел охоты<br />
+                        В хронологической пыли<br />
+                        Бытописания земли:<br />
+                        Но дней минувших анекдоты<br />
+                        От Ромула до наших дней<br />
+                        Хранил он в памяти своей.<br />
+    <br />
+                                     VII<br />
+    <br />
+                        Высокой страсти не имея<br />
+                        Для звуков жизни не щадить,<br />
+                        Не мог он ямба от хорея,<br />
+                        Как мы ни бились, отличить.<br />
+                        Бранил Гомера, Феокрита;<br />
+                        Зато читал Адама Смита<br />
+                        И был глубокой эконом,<br />
+                        То есть умел судить о том,<br />
+                        Как государство богатеет,<br />
+                        И чем живет, и почему<br />
+                        Не нужно золота ему,<br />
+                        Когда простой продукт имеет.<br />
+                        Отец понять его не мог<br />
+                        И земли отдавал в залог.<br />
+    <br />
+                                     VIII<br />
+    <br />
+                        Всего, что знал еще Евгений,<br />
+                        Пересказать мне недосуг;<br />
+                        Но в чем он истинный был гений,<br />
+                        Что знал он тверже всех наук,<br />
+                        Что было для него измлада<br />
+                        И труд, и мука, и отрада,<br />
+                        Что занимало целый день<br />
+                        Его тоскующую лень, -<br />
+                        Была наука страсти нежной,<br />
+                        Которую воспел Назон,<br />
+                        За что страдальцем кончил он<br />
+                        Свой век блестящий и мятежный<br />
+                        В Молдавии, в глуши степей,<br />
+                        Вдали Италии своей.<br />
+    <br />
+                                      IX<br />
+    <br />
+                        . . . . . . . . . . . . . . . . . .<br />
+                        . . . . . . . . . . . . . . . . . .<br />
+                        . . . . . . . . . . . . . . . . . .<br />
+    <br />
+  </p>
+</body>
+</html>
