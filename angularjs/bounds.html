@@ -4,9 +4,7 @@
   <meta charset="utf-8" />
   <title>Bounds directive</title>
   <style type="text/css">.ng-cloak { display: none; }</style>
-<!--  <link type="text/css" rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />-->
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
-<!--  <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.13.0.js"></script>-->
   <script>
 angular.module("app", []).
 directive(
@@ -44,22 +42,25 @@ directive(
           post: function(scope, element, attrs)
           {
             var fn = $parse(attrs.uiScroll);
-            var applying;
+            var event;
 
             element.on(
               "scroll",
-              function(event)
+              function(e)
               {
-                if (!applying)
+                if (!event)
                 {
-                  applying = true;
                   scope.$applyAsync(
                     function()
                     {
-                      applying = false;
-                      fn(scope, { $event: event });
+                      var $event = event;
+
+                      event = null;
+                      fn(scope, { $event: $event });
                     });
                 }
+
+                event = e;
               });
           }
         }
@@ -122,13 +123,13 @@ body
 </head>
 <body ng-app="app" ui-scroll>
   <div class="head" ui-bounds="headBounds"
-    ng-style="{marginBottom: headBounds.top < -headBounds.height ? menuBounds.height.toFixed(2) + 'px' : null}">
+    ng-style="{marginBottom: headBounds.top < -headBounds.height ? menuBounds.height.toFixed() + 'px' : null}">
     <span class="login">login</span>
     <span class="logo">My Library</span>
   </div>
   <div class="menu" ui-bounds="menuBounds"
     ng-class="{fixed: headBounds.top < -headBounds.height}"
-    ng-style="{width: headBounds.width.toFixed(2) + 'px'}">
+    ng-style="{width: headBounds.width.toFixed() + 'px'}">
     <a href="#">File</a> |
     <a href="#">Edit</a> |
     <a href="#">View</a> |
