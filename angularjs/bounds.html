@@ -100,6 +100,7 @@ directive(
   top: 0;
   left: 0;
   width: 100%;
+  z-index: 1;
 }
 
 html 
@@ -123,12 +124,12 @@ body
 </head>
 <body ng-app="app" ui-scroll>
   <div class="head" ui-bounds="headBounds"
-    ng-style="{marginBottom: headBounds.top < -headBounds.height ? menuBounds.height.toFixed() + 'px' : null}">
+    ng-style="{marginBottom: headBounds.bottom < 0 ? menuBounds.height.toFixed() + 'px' : null}">
     <span class="login">login</span>
     <span class="logo">My Library</span>
   </div>
   <div class="menu" ui-bounds="menuBounds"
-    ng-class="{fixed: headBounds.top < -headBounds.height}"
+    ng-class="{fixed: headBounds.bottom < 0}"
     ng-style="{width: headBounds.width.toFixed() + 'px'}">
     <a href="#">File</a> |
     <a href="#">Edit</a> |
@@ -138,6 +139,22 @@ body
   </div>
 
   <div>
+    <br/>
+    
+    <div style="width: 50em; overflow: hidden; background: pink">
+      <pre style="position: relative" ng-style="{left: bodyBounds.left.toFixed() + 'px'}">My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head My head</pre>
+    </div>
+    <div style="width: 50em; height: 5em; overflow: auto; background: blue" ui-scroll>
+      <pre ui-bounds="bodyBounds">My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body
+My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body
+My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body
+My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body
+My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body
+My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body
+My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body My body</pre>
+    </div>
+
+
     <br />
                           Александр Сергеевич Пушкин<br />
     <br />
