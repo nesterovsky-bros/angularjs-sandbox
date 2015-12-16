@@ -1,2 +1,2 @@
-# angularjs-api
+# angularjs-sandbox
 AngularJS sandbox.
